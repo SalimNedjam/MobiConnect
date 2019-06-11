@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "605578960645",
+    "firebase_url": "https://mobiconnect-e4613.firebaseio.com",
+    "project_id": "mobiconnect-e4613",
+    "storage_bucket": "mobiconnect-e4613.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605578960645:android:bdfc29579777c437",
+        "android_client_info": {
+          "package_name": "com.mobiconnect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "605578960645-49926fp5ulbj6cbjinfh2tberak3fpjd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mobiconnect",
+            "certificate_hash": "dbcdee5f7afa67719aaaecb9dc90c0092bc6c35e"
+          }
+        },
+        {
+          "client_id": "605578960645-11dq8al32nn2d0bveb4isd2usg0d1aat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDarSY4YfgyhtmVJbKhN6yUhFead-gBBes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "605578960645-11dq8al32nn2d0bveb4isd2usg0d1aat.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

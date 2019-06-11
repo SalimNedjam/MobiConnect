@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+
+android {
+
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.mobiconnect"
+        minSdkVersion 17
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.2"
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LGPL-3.0.txt'
+    }
+    productFlavors {
+    }
+
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        //noinspection GradleCompatible
+        implementation 'com.android.support:appcompat-v7:27.1.1'
+        implementation 'com.android.support:recyclerview-v7:27.1.1'
+        implementation 'com.android.support:support-v4:27.1.1'
+        implementation 'com.android.support:design:27.1.1'
+        implementation 'com.squareup.picasso:picasso:2.5.2'
+        implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+        implementation 'com.devbrackets.android:exomedia:4.2.0'
+        implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+        implementation 'com.google.android.gms:play-services-ads:17.2.1'
+
+
+
+    }
+}
+apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+}
