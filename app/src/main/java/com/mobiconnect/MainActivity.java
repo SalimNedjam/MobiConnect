@@ -10,7 +10,6 @@ import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -70,9 +69,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             public void onAdClosed() {
                 try {
                     rewarded = false;
-                    Intent intent = new Intent(ctx, playerExo.class);
+                    Intent intent = new Intent(ctx, ExoPlayer2.class);
                     intent.putExtra("Name", rewardedLink.getItemName());
                     intent.putExtra("Url", rewardedLink.getItemUrl());
+                    intent.putExtra("Agent", rewardedLink.getItemUserAgent());
+
                     ctx.startActivity(intent);
                 } catch (Exception ignored) {
                 }
@@ -103,9 +104,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 if (rewarded) {
                     try {
                         rewarded = false;
-                        Intent intent = new Intent(ctx, playerExo.class);
+                        Intent intent = new Intent(ctx, ExoPlayer2.class);
                         intent.putExtra("Name", rewardedLink.getItemName());
                         intent.putExtra("Url", rewardedLink.getItemUrl());
+                        intent.putExtra("Agent", rewardedLink.getItemUserAgent());
+
                         ctx.startActivity(intent);
                     } catch (Exception ignored) {
                     }
@@ -159,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mAdapter = new PlaylistAdapter(this);
         mPlaylistList.setAdapter(mAdapter);
         //loader(filepath.getPath());
-        //new downloadFile().execute("https://lookaside.fbsbx.com/file/today.m3u?token=AWyka0Nr7nrupPz8muaU3opKSAMbyAofP6_EubLCp5LvKO4Hk3K4LT7ndRyl_rDRIrp8uZgJv_c6NPExmfkZ1R4viW0V00pi6n4Rq2mv2dx9i2UZQx6AYKOpxur2tXbxty-icYP8-CvtnfFpFhcaR9A76AiCABT64_5pUXapMQZp1w"); // this will read direct channels from url
+        //new downloadFile().execute("http://m-iptv.net:6204/get.php?username=AFEOdvNlBf&password=3zrFg7Q96M&type=m3u_plus&output=ts");
         new downloadFile().execute("https://deepapp.000webhostapp.com/datas.m3u");
     }
 
@@ -278,16 +281,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             rewardedLink = imm;
             Log.e("hii", "rewaed" + mRewardedVideoAd.isLoaded());
 
-            if (mRewardedVideoAd.isLoaded()) {
+            if (!mRewardedVideoAd.isLoaded()) {
                 mRewardedVideoAd.show();
-            } else if (mInterstitialAd.isLoaded()) {
+            } else if (!mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             } else {
                 try {
                     rewarded = false;
-                    Intent intent = new Intent(this, playerExo.class);
+                    Intent intent = new Intent(this, ExoPlayer2.class);
                     intent.putExtra("Name", imm.getItemName());
                     intent.putExtra("Url", imm.getItemUrl());
+                    intent.putExtra("Agent", imm.getItemUserAgent());
+
                     this.startActivity(intent);
                 } catch (Exception ignored) {
                 }

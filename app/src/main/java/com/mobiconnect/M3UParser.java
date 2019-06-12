@@ -4,9 +4,7 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -46,8 +44,12 @@ class M3UParser {
                     m3UPlaylist.setPlaylistParams("No Params");
                 }
             } else {
-                String pattern = "group-title=\"(.*)\"";
+                String pattern = ".*group-title=\"(.*)\".*";
                 Pattern r = Pattern.compile(pattern);
+
+                String patternUserAgent = ".*agent=(.*)";
+                Pattern rAgent = Pattern.compile(patternUserAgent);
+
 
                 M3UItem playlistItem = new M3UItem();
                 String[] dataArray = currLine.split(",");
@@ -62,9 +64,23 @@ class M3UParser {
                     playlistItem.setItemIcon("");
                 }
                 try {
+                    System.out.println("-----------------" + currLine + "-------------");
+                    Matcher mAgent = rAgent.matcher(dataArray[1]);
+                    if (mAgent.find()) {
+
+                        playlistItem.setItemUserAgent(mAgent.group(1));
+                    }
+
+
+
                     Matcher m = r.matcher(dataArray[0]);
+                    Matcher m1 = r.matcher(dataArray[1]);
+
                     if (m.find()) {
                         playlistItem.setItemGroup(m.group(1).trim().toUpperCase());
+                    } else if (m1.find()) {
+                        playlistItem.setItemGroup(m1.group(1).trim().toUpperCase());
+
                     }
 
                     String url = dataArray[1].substring(dataArray[1].indexOf(EXT_URL)).replace("\n", "").replace("\r", "");

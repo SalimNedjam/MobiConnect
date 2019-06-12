@@ -8,6 +8,7 @@ class M3UItem {
 
     var itemGroup: String? = null
 
+    var itemUserAgent: String? = null
 
     var itemUrl: String? = null
 

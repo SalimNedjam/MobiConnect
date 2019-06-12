@@ -31,6 +31,10 @@
             android:name="com.mobiconnect.playerExo"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.mobiconnect.ExoPlayer2"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
