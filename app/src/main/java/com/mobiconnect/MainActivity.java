@@ -3,10 +3,13 @@ package com.mobiconnect;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Animatable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -39,13 +42,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private RecyclerView mPlaylistList;
     private InputStream is;
     private PlaylistAdapter mAdapter;
-
+    MenuItem search;
     private RewardedVideoAd mRewardedVideoAd;
     private InterstitialAd mInterstitialAd;
     private AdView mAdView;
     private M3UItem rewardedLink;
     private boolean rewarded;
     M3UPlaylist playlist;
+    GridLayoutManager layoutManager;
     private Context ctx = this;
 
 
@@ -142,38 +146,31 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mAdView.loadAd(adRequest);
 
 
+
+
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.playlist_recycler);
+        recyclerView.getItemAnimator().setChangeDuration(100);
         mPlaylistParams = findViewById(R.id.playlist_params);
         mPlaylistList = findViewById(R.id.playlist_recycler);
         spinner = findViewById(R.id.login_progress);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager = new GridLayoutManager(this,3);
         mPlaylistList.setLayoutManager(layoutManager);
         mAdapter = new PlaylistAdapter(this);
         mPlaylistList.setAdapter(mAdapter);
         //loader(filepath.getPath());
         //new downloadFile().execute("https://lookaside.fbsbx.com/file/today.m3u?token=AWyka0Nr7nrupPz8muaU3opKSAMbyAofP6_EubLCp5LvKO4Hk3K4LT7ndRyl_rDRIrp8uZgJv_c6NPExmfkZ1R4viW0V00pi6n4Rq2mv2dx9i2UZQx6AYKOpxur2tXbxty-icYP8-CvtnfFpFhcaR9A76AiCABT64_5pUXapMQZp1w"); // this will read direct channels from url
-        new downloadFile().execute("https://cdn.fbsbx.com/v/t59.3654-21/60778134_452602911980059_8564121043982090240_n.m3u/tv_channels_75641_plus.m3u?_nc_cat=107&_nc_ht=cdn.fbsbx.com&oh=ea59bab343440a852c2e5fd6c2695710&oe=5CFF5343&dl=1&fbclid=IwAR1f8N2fWmnzxPtmty9erK-iudOFsu4FnLTOvNYiYgv9Ushaat3zUynARlM");
-    }
-
-
-    void loader() {
-
-        try { //new FileInputStream (new File(name)
-            is = getAssets().open("data.m3u"); // if u r trying to open file from asstes InputStream is = getassets.open(); InputStream
-            M3UPlaylist playlist = parser.parseFile(is);
-            mAdapter.update(playlist.getPlaylistItems());
-        } catch (Exception e) {
-            Log.d("Google", "" + e.toString());
-        }
-    }
-
-    protected void onResume() {
-        super.onResume();
-        mRewardedVideoAd.resume(this);
-
+        new downloadFile().execute("https://deepapp.000webhostapp.com/datas.m3u");
     }
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        search = menu.findItem(R.id.app_bar_search);
+        return true;
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         MenuItem search = menu.findItem(R.id.app_bar_search);
@@ -196,28 +193,65 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
-            case R.id.app_bar_search:
-                setContentView(R.layout.searchable);
+
+            case R.id.action_list_to_grid:
+                if (!((Animatable) item.getIcon()).isRunning()) {
+                    if (layoutManager.getSpanCount() == 1) {
+                        item.setIcon(AnimatedVectorDrawableCompat.create(MainActivity.this, R.drawable.avd_grid_to_list));
+                        layoutManager.setSpanCount(3);
+                        mAdapter.setGroup(true);
+                        mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+
+                    }
+                }
                 break;
             default: {
                 return super.onOptionsItemSelected(item);
             }
         }
-        return true;
+
+
+        return super.onOptionsItemSelected(item);
     }
+
+    void loader() {
+
+        try { //new FileInputStream (new File(name)
+            is = getAssets().open("data.m3u"); // if u r trying to open file from asstes InputStream is = getassets.open(); InputStream
+            M3UPlaylist playlist = parser.parseFile(is);
+            mAdapter.update(playlist.getPlaylistItems());
+        } catch (Exception e) {
+            Log.d("Google", "" + e.toString());
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        mRewardedVideoAd.resume(this);
+
+    }
+
 
 
     private boolean filter(final String newText) {
         if (mAdapter != null) {
+
             if (newText.isEmpty()) {
+                layoutManager.setSpanCount(3);
+                mAdapter.setGroup(true);
                 new _loadFile().execute();
             } else {
+                layoutManager.setSpanCount(1);
+                mAdapter.setGroup(false);
                 mAdapter.getFilter().filter(newText);
             }
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+
             return true;
         } else {
-            new downloadFile().execute("https://cdn.fbsbx.com/v/t59.3654-21/60778134_452602911980059_8564121043982090240_n.m3u/tv_channels_75641_plus.m3u?_nc_cat=107&_nc_ht=cdn.fbsbx.com&oh=ea59bab343440a852c2e5fd6c2695710&oe=5CFF5343&dl=1&fbclid=IwAR1f8N2fWmnzxPtmty9erK-iudOFsu4FnLTOvNYiYgv9Ushaat3zUynARlM");
+            new downloadFile().execute("https://deepapp.000webhostapp.com/datas.m3u");
             return false;
         }
     }
@@ -240,24 +274,31 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     public void runReward(M3UItem imm) {
 
-        rewardedLink = imm;
-        Log.e("hii", "rewaed" + mRewardedVideoAd.isLoaded());
+        if(layoutManager.getSpanCount()==1){
+            rewardedLink = imm;
+            Log.e("hii", "rewaed" + mRewardedVideoAd.isLoaded());
 
-        if (mRewardedVideoAd.isLoaded()) {
-            mRewardedVideoAd.show();
-        } else if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            try {
-                rewarded = false;
-                Intent intent = new Intent(this, playerExo.class);
-                intent.putExtra("Name", imm.getItemName());
-                intent.putExtra("Url", imm.getItemUrl());
-                this.startActivity(intent);
-            } catch (Exception ignored) {
+            if (mRewardedVideoAd.isLoaded()) {
+                mRewardedVideoAd.show();
+            } else if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            } else {
+                try {
+                    rewarded = false;
+                    Intent intent = new Intent(this, playerExo.class);
+                    intent.putExtra("Name", imm.getItemName());
+                    intent.putExtra("Url", imm.getItemUrl());
+                    this.startActivity(intent);
+                } catch (Exception ignored) {
+                }
             }
+            loadRewardedVideoAd();
         }
-        loadRewardedVideoAd();
+        else{
+            layoutManager.setSpanCount(1);
+            mAdapter.setGroup(false);
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+        }
 
 
     }
@@ -269,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             spinner.setVisibility(View.VISIBLE);
         }
 
@@ -294,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             mAdapter.notifyDataSetChanged();
 
             spinner.setVisibility(View.GONE);
+            search.setVisible(true);
 
         }
     }
@@ -304,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             spinner.setVisibility(View.VISIBLE);
         }
 
@@ -323,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             spinner.setVisibility(View.GONE);
+            search.setVisible(true);
+
         }
     }
 }

@@ -8,10 +8,17 @@
         android:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/search"
-        android:visible="true"
+        android:visible="false"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always"
         tools:ignore="AppCompatResource" />
+    <item
+        android:id="@+id/action_list_to_grid"
+        android:title="@string/title_list_to_grid"
+        android:orderInCategory="1"
+        android:icon="@drawable/avd_grid_to_list"
+        app:showAsAction="always"
+        />
 
 
 </menu>

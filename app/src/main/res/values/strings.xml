@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">MobiConnect</string>
+
     <string name="about">About</string>
+
     <string name="search">Search</string>
     <string name="banner_ad_unit_id_test">ca-app-pub-8265484806809068/7996574868</string>
     <string name="reward_ad_unit_id_test">ca-app-pub-8265484806809068/2576727220</string>
 
     <string name="browse">Browse</string>
 
+    <string name="title_list_to_grid">List to grid</string>
 </resources>

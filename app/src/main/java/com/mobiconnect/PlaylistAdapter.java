@@ -16,17 +16,34 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHolder> implements Filterable {
 
     private final Context mContext;
     private final LayoutInflater mInflater;
+    Map<String,List<M3UItem>> group=new TreeMap<>();
+    private boolean isGroup=true;
+
+
     private List<M3UItem> mItem = new ArrayList<>();
     private List<M3UItem> mItemSaved = new ArrayList<>();
     private final List<M3UItem> res = new ArrayList<>();
 
     private final ColorGenerator generator = ColorGenerator.MATERIAL;
+
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(boolean group) {
+        isGroup = group;
+    }
+
 
     public PlaylistAdapter(Context c) {
         mContext = c;
@@ -35,7 +52,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHo
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View sView = mInflater.inflate(R.layout.item_playlist, parent, false);
+        final View sView = mInflater.inflate(R.layout.item_card, parent, false);
         return new ItemHolder(sView);
     }
 
@@ -46,15 +63,33 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHo
 
     @Override
     public void onBindViewHolder(final ItemHolder holder, final int position) {
-        final M3UItem item = mItem.get(position);
-        if (item != null) {
-            holder.update(item);
+
+
+
+        if (isGroup)
+        {
+            final M3UItem item = group.get(group.keySet().toArray()[position]).get(0);
+            System.out.println("\""+item.getItemGroup()+"\"");
+
+            if (item != null) {
+                holder.update(item);
+            }
+        }
+        else
+        {
+            final M3UItem item = mItem.get(position);
+            if (item != null) {
+                holder.update(item);
+            }
         }
     }
 
     @Override
     public int getItemCount() {
-        return mItem.size();
+        if (isGroup)
+            return group.keySet().size();
+        else
+            return mItem.size();
     }
 
     void update(List<M3UItem> _list) {
@@ -62,9 +97,19 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHo
         mItem.addAll(_list);
         this.mItemSaved = new ArrayList<>();
         mItemSaved.addAll(_list);
+        group=new TreeMap<>();
+        for (M3UItem item:mItemSaved){
+            if(!group.containsKey(item.getItemGroup() ))
+                group.put(item.getItemGroup(),new ArrayList<M3UItem>());
+            group.get(item.getItemGroup()).add(item);
+        }
 
     }
+    public void getGroupItem(String regex){
 
+        mItem=group.get(regex);
+        notifyDataSetChanged();
+    }
     @Override
     public Filter getFilter() {
         return new Filter() { //TODO search it on github
@@ -90,7 +135,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHo
                 return null;
             }
         };
+
+
     }
+
+
 
     public class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -107,31 +156,62 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ItemHo
         }
 
         void update(final M3UItem item) {
-            try {
-                name.setText(item.getItemName());
-                int color = generator.getRandomColor();
-                TextDrawable textDrawable;
-                if (item.getItemIcon().isEmpty()) {
-                    textDrawable = TextDrawable.builder()
-                            .buildRoundRect(String.valueOf(item.getItemName().charAt(0)), color, 100);
-                    cImg.setImageDrawable(textDrawable);
-                } else {
-                    if (Utils.getInstance().isNetworkAvailable(mContext)) {
-                        Picasso.with(mContext).load(item.getItemIcon()).into(cImg);
-                    } else {
+            if(isGroup){
+                try {
+                    name.setText(item.getItemGroup());
+                    int color = generator.getRandomColor();
+                    TextDrawable textDrawable;
+                    if (item.getItemIcon().isEmpty()) {
                         textDrawable = TextDrawable.builder()
                                 .buildRoundRect(String.valueOf(item.getItemName().charAt(0)), color, 100);
                         cImg.setImageDrawable(textDrawable);
+                    } else {
+                        if (Utils.getInstance().isNetworkAvailable(mContext)) {
+                            Picasso.with(mContext).load(item.getItemIcon()).into(cImg);
+                        } else {
+                            textDrawable = TextDrawable.builder()
+                                    .buildRoundRect(String.valueOf(item.getItemName().charAt(0)), color, 100);
+                            cImg.setImageDrawable(textDrawable);
+                        }
                     }
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
+            }
+            else {
+                try {
+                    name.setText(item.getItemName());
+                    int color = generator.getRandomColor();
+                    TextDrawable textDrawable;
+                    if (item.getItemIcon().isEmpty()) {
+                        textDrawable = TextDrawable.builder()
+                                .buildRoundRect(String.valueOf(item.getItemName().charAt(0)), color, 100);
+                        cImg.setImageDrawable(textDrawable);
+                    } else {
+                        if (Utils.getInstance().isNetworkAvailable(mContext)) {
+                            Picasso.with(mContext).load(item.getItemIcon()).into(cImg);
+                        } else {
+                            textDrawable = TextDrawable.builder()
+                                    .buildRoundRect(String.valueOf(item.getItemName().charAt(0)), color, 100);
+                            cImg.setImageDrawable(textDrawable);
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
             }
         }
 
         public void onClick(View v) {
-            MainActivity main = (MainActivity) mContext;
-            M3UItem imm = mItem.get(getLayoutPosition());
-            main.runReward(imm);
+
+
+                MainActivity main = (MainActivity) mContext;
+                M3UItem imm = mItem.get(getLayoutPosition());
+            if (isGroup){
+                getGroupItem((String)group.keySet().toArray()[getLayoutPosition()]);
+            }
+                main.runReward(imm);
+
+
+
 
         }
 

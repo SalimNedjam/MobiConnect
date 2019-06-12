@@ -4,9 +4,13 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class M3UParser {
 
@@ -26,6 +30,7 @@ class M3UParser {
 
     public M3UPlaylist parseFile(InputStream inputStream) {
         M3UPlaylist m3UPlaylist = new M3UPlaylist();
+
         List<M3UItem> playlistItems = new ArrayList<>();
         String stream = convertStreamToString(inputStream);
         String linesArray[] = stream.split(EXT_INF);
@@ -41,6 +46,9 @@ class M3UParser {
                     m3UPlaylist.setPlaylistParams("No Params");
                 }
             } else {
+                String pattern = "group-title=\"(.*)\"";
+                Pattern r = Pattern.compile(pattern);
+
                 M3UItem playlistItem = new M3UItem();
                 String[] dataArray = currLine.split(",");
                 if (dataArray[0].contains(EXT_LOGO)) {
@@ -54,16 +62,25 @@ class M3UParser {
                     playlistItem.setItemIcon("");
                 }
                 try {
+                    Matcher m = r.matcher(dataArray[0]);
+                    if (m.find()) {
+                        playlistItem.setItemGroup(m.group(1).trim().toUpperCase());
+                    }
+
                     String url = dataArray[1].substring(dataArray[1].indexOf(EXT_URL)).replace("\n", "").replace("\r", "");
                     String name = dataArray[1].substring(0, dataArray[1].indexOf(EXT_URL)).replace("\n", "").replaceAll("[-_]", " ").toUpperCase();
                     playlistItem.setItemName(name);
-                    playlistItem.setItemUrl(url);
+
+
+                        playlistItem.setItemUrl(url);
                 } catch (Exception fdfd) {
                     Log.e("Google", "Error: " + fdfd.fillInStackTrace());
                 }
-                playlistItems.add(playlistItem);
+                if (playlistItem.getItemName()!=null && !playlistItem.getItemName().contains("==="))
+                    playlistItems.add(playlistItem);
             }
         }
+
         m3UPlaylist.setPlaylistItems(playlistItems);
         return m3UPlaylist;
     }
